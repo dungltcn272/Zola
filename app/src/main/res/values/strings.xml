@@ -1,0 +1,18 @@
+<resources>
+    <string name="app_name">Zola</string>
+    <string name="email">Email</string>
+    <string name="password">Password</string>
+    <string name="sign_in">Sign in</string>
+    <string name="you_don_t_have_an_account">You don\'t have an account?</string>
+    <string name="go_to_sign_up">Go to Sign up</string>
+    <string name="sign_up">Sign up</string>
+    <string name="you_have_an_account">You have an account?</string>
+    <string name="go_to_sign_in">Go to sign in</string>
+    <string name="confirm_password">Confirm password</string>
+    <string name="username">Username</string>
+    <string name="add_image">Add image</string>
+    <string name="chat">Chat</string>
+    <string name="search">Search</string>
+    <string name="type_a_message">Type a message</string>
+    <string name="online">Online</string>
+</resources>

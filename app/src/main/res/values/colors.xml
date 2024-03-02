@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+    <color name="blue_darker">#1B44A8</color>
+    <color name="sender">#4F00DC</color>
+    <color name="receiver">#BABABA</color>
+    <color name="blue_light">#2055D8</color>
+    <color name="primary">#FFFEFE</color>
+    <color name="primary_second">#FBFBFB</color>
+    <color name="primary_text">#101010</color>
+    <color name="second_text">#717171</color>
+    <color name="red">#FF0000</color>
+    <color name="grey">#A6A6A6</color>
+    <color name="green">#009C06</color>
+    <color name="black_light">#151515</color>
+
+</resources>

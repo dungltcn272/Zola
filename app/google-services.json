@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "366702579504",
+    "project_id": "zola-694ff",
+    "storage_bucket": "zola-694ff.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:366702579504:android:ddefa6b3ad8767045302f5",
+        "android_client_info": {
+          "package_name": "com.dungltcn272.zola"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCd-z3Bh24TKwINujgGEzV_3a1HrDI9gPc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
