@@ -41,7 +41,7 @@ class ChatActivity : BaseActivity() {
     private lateinit var database: FirebaseFirestore
     private lateinit var chatMessages: MutableList<ChatMessage>
     private lateinit var chatAdapter: ChatAdapter
-    private var conversionId: String? = null
+    private var conversationId: String? = null
     private var isReceiverAvailable: Boolean = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -143,8 +143,8 @@ class ChatActivity : BaseActivity() {
             }
         }
         binding.progressBar.visibility = View.GONE
-        if (conversionId == null) {
-            checkForConversion()
+        if (conversationId == null) {
+            checkForConversation()
         }
 
     }
@@ -156,8 +156,8 @@ class ChatActivity : BaseActivity() {
         message[Constants.KEY_MESSAGE] = binding.edtMessage.text.toString().trim()
         message[Constants.KEY_TIMESTAMP] = Date()
         database.collection(Constants.KEY_COLLECTION_CHAT).add(message)
-        if (conversionId != null) {
-            updateConversion(binding.edtMessage.text.toString().trim())
+        if (conversationId != null) {
+            updateConversation(binding.edtMessage.text.toString().trim())
         } else {
             val conversion = hashMapOf<String, Any>()
             conversion[Constants.KEY_SENDER_ID] =
@@ -171,7 +171,7 @@ class ChatActivity : BaseActivity() {
             conversion[Constants.KEY_RECEIVER_NAME] = receiverUser.name
             conversion[Constants.KEY_LAST_MESSAGE] = binding.edtMessage.text.toString().trim()
             conversion[Constants.KEY_TIMESTAMP] = Date()
-            addConversion(conversion)
+            addConversation(conversion)
         }
         if (!isReceiverAvailable) {
             try {
@@ -189,7 +189,6 @@ class ChatActivity : BaseActivity() {
                 val body = JSONObject()
                 body.put(Constants.REMOTE_MSG_DATA, data)
                 body.put(Constants.REMOTE_MSG_REGISTRATION_IDS, tokens)
-
                 sendNotification(body.toString())
             } catch (e: Exception) {
                 showToast(e.message.toString())
@@ -281,44 +280,44 @@ class ChatActivity : BaseActivity() {
         imm.hideSoftInputFromWindow(currentFocus?.windowToken, 0)
     }
 
-    private fun addConversion(conversion: HashMap<String, Any>) {
+    private fun addConversation(conversion: HashMap<String, Any>) {
         database.collection(Constants.KEY_COLLECTION_CONVERSATIONS)
             .add(conversion)
-            .addOnSuccessListener { documentReferences -> conversionId = documentReferences.id }
+            .addOnSuccessListener { documentReferences -> conversationId = documentReferences.id }
     }
 
-    private fun updateConversion(message: String) {
-        database.collection(Constants.KEY_COLLECTION_CONVERSATIONS).document(conversionId!!)
+    private fun updateConversation(message: String) {
+        database.collection(Constants.KEY_COLLECTION_CONVERSATIONS).document(conversationId!!)
             .update(Constants.KEY_LAST_MESSAGE, message, Constants.KEY_TIMESTAMP, Date())
     }
 
-    private fun checkForConversion() {
+    private fun checkForConversation() {
         if (chatMessages.size > 0) {
-            checkForConversionRemotely(
+            checkForConversationRemotely(
                 preferenceManager.getString(Constants.KEY_USER_ID)!!,
                 receiverUser.id
             )
-            checkForConversionRemotely(
+            checkForConversationRemotely(
                 receiverUser.id,
                 preferenceManager.getString(Constants.KEY_USER_ID)!!
             )
         }
     }
 
-    private fun checkForConversionRemotely(senderId: String, receiverId: String) {
+    private fun checkForConversationRemotely(senderId: String, receiverId: String) {
         database.collection(Constants.KEY_COLLECTION_CONVERSATIONS)
             .whereEqualTo(Constants.KEY_SENDER_ID, senderId)
             .whereEqualTo(Constants.KEY_RECEIVER_ID, receiverId)
             .get()
-            .addOnCompleteListener(conversionOnCompleteListener)
+            .addOnCompleteListener(conversationOnCompleteListener)
 
     }
 
-    private val conversionOnCompleteListener: OnCompleteListener<QuerySnapshot> =
+    private val conversationOnCompleteListener: OnCompleteListener<QuerySnapshot> =
         OnCompleteListener { task ->
             if (task.isSuccessful && task.result != null && task.result.documents.size > 0) {
                 val documentSnapshot = task.result.documents[0]
-                conversionId = documentSnapshot.id
+                conversationId = documentSnapshot.id
             }
         }
 

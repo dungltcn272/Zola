@@ -20,6 +20,7 @@ import com.google.firebase.messaging.RemoteMessage
 import kotlin.random.Random
 
 class MessagingService : FirebaseMessagingService() {
+
     override fun onNewToken(token: String) {
         super.onNewToken(token)
         Log.d("FCM", "Token $token")
@@ -27,33 +28,38 @@ class MessagingService : FirebaseMessagingService() {
 
     override fun onMessageReceived(message: RemoteMessage) {
         super.onMessageReceived(message)
-        Log.d("FCM", "Message ${message.notification?.body}")
+        Log.d("FCM", "Token mm $message")
+
+        val notificationMessage = message.data[Constants.KEY_MESSAGE] ?: ""
+
         val user = User().apply {
-            id = message.data[Constants.KEY_USER_ID]!!
-            name = message.data[Constants.KEY_NAME]!!
-            token = message.data[Constants.KEY_FCM_TOKEN]!!
+            name = message.data[Constants.KEY_NAME] ?: ""
+            id = message.data[Constants.KEY_USER_ID] ?: ""
+            token = message.data[Constants.KEY_FCM_TOKEN] ?: ""
         }
-        val notification = Random.nextInt()
+
+        showNotification(user, notificationMessage)
+    }
+
+    private fun showNotification(user: User, message: String) {
+        val notificationId = Random.nextInt()
         val channelId = "chat_message"
 
         val intent = Intent(this, ChatActivity::class.java)
         intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
         intent.putExtra(Constants.KEY_USER, user)
-        val pendingIntent = PendingIntent.getActivities(this, 0, arrayOf(intent),
-            PendingIntent.FLAG_MUTABLE)
+        val pendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT)
 
         val builder = NotificationCompat.Builder(this, channelId)
         builder.setSmallIcon(R.drawable.ic_notifications)
         builder.setContentTitle(user.name)
-        builder.setContentText(message.data[Constants.KEY_MESSAGE])
-        builder.setStyle(NotificationCompat.BigTextStyle().bigText(
-            message.data[Constants.KEY_MESSAGE]
-        ))
+        builder.setContentText(message)
+        builder.setStyle(NotificationCompat.BigTextStyle().bigText(message))
         builder.setPriority(NotificationCompat.PRIORITY_DEFAULT)
         builder.setContentIntent(pendingIntent)
         builder.setAutoCancel(true)
 
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val channelName = "Chat Message"
             val channelDescription = "This notification channel is used for chat message notifications"
             val importance = NotificationManager.IMPORTANCE_DEFAULT
@@ -66,17 +72,14 @@ class MessagingService : FirebaseMessagingService() {
         val notificationManagerCompat = NotificationManagerCompat.from(this)
         if (ActivityCompat.checkSelfPermission(
                 this,
-                Manifest.permission.INTERNET
+                Manifest.permission.POST_NOTIFICATIONS
             ) != PackageManager.PERMISSION_GRANTED
         ) {
+
             return
         }
+        notificationManagerCompat.notify(notificationId, builder.build())
 
-        notificationManagerCompat.notify(notification, builder.build())
-
-        Log.d("FCM", "User ID: ${user.id}, Name: ${user.name}, Token: ${user.token}")
-        Log.d("FCM", "Message Data: ${message.data}")
-
+        Log.d("FCM", "Notification sent with ID: $notificationId")
     }
-
 }
