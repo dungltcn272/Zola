@@ -178,12 +178,7 @@ class ChatActivity : BaseActivity() {
                 val tokens = JSONArray()
                 tokens.put(receiverUser.token)
                 val data = JSONObject()
-                data.put(Constants.KEY_USER_ID, preferenceManager.getString(Constants.KEY_USER_ID))
                 data.put(Constants.KEY_NAME, preferenceManager.getString(Constants.KEY_NAME))
-                data.put(
-                    Constants.KEY_FCM_TOKEN,
-                    preferenceManager.getString(Constants.KEY_FCM_TOKEN)
-                )
                 data.put(Constants.KEY_MESSAGE, binding.edtMessage.text.toString().trim())
 
                 val body = JSONObject()
@@ -214,7 +209,7 @@ class ChatActivity : BaseActivity() {
                                 val results: JSONArray = responseJson.getJSONArray("results")
                                 if (responseJson.getInt("failure") == 1) {
                                     val error = results[0] as JSONObject
-                                    showToast(error.getString("error"))
+                                    showToast("BUG" +error.getString("error"))
                                     return
                                 }
                             }
