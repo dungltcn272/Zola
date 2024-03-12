@@ -16,4 +16,6 @@
     <string name="type_a_message">Type a message</string>
     <string name="online">Online</string>
     <string name="update">Update</string>
+    <string name="connecting">Connecting...</string>
+    <string name="internet_access">Internet access</string>
 </resources>

@@ -1,7 +1,13 @@
 package com.dungltcn272.zola.ui.main_screen
 
+import android.annotation.SuppressLint
+import android.content.Context
 import android.content.Intent
 import android.graphics.BitmapFactory
+import android.net.ConnectivityManager
+import android.net.Network
+import android.net.NetworkCapabilities
+import android.net.NetworkRequest
 import android.os.Bundle
 import android.util.Base64
 import android.util.Log
@@ -33,6 +39,8 @@ class MainActivity : BaseActivity() {
     private lateinit var conversationAdapter: RecentConversationAdapter
     private var encodedImage : String? = null
     private lateinit var conversations: MutableList<ChatMessage>
+    private lateinit var connectivityManager: ConnectivityManager
+    private lateinit var networkCallback: ConnectivityManager.NetworkCallback
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -44,6 +52,7 @@ class MainActivity : BaseActivity() {
         init()
         getToken()
         setListener()
+        listenerNetworkChange()
         listenerConversation()
     }
 
@@ -115,6 +124,7 @@ class MainActivity : BaseActivity() {
 
     }
 
+    @SuppressLint("NotifyDataSetChanged")
     private val eventListener: EventListener<QuerySnapshot> = EventListener { value, error ->
         if (error != null) {
             return@EventListener
@@ -222,6 +232,40 @@ class MainActivity : BaseActivity() {
         documentReference.update(Constants.KEY_FCM_TOKEN, token)
             .addOnSuccessListener { showToast("Token update successfully") }
             .addOnFailureListener { showToast("Unable to update token") }
+    }
+
+    private fun listenerNetworkChange() {
+        connectivityManager = getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+
+        networkCallback = object : ConnectivityManager.NetworkCallback() {
+            override fun onAvailable(network: Network) {
+                // have internet
+                runOnUiThread {
+                    binding.tvNoInternet.visibility = View.GONE
+                    binding.tvHaveInternet.visibility = View.VISIBLE
+                    binding.tvHaveInternet.postDelayed({ binding.tvHaveInternet.visibility = View.GONE }, 2000)
+                }
+            }
+
+            override fun onLost(network: Network) {
+                // no internet
+                runOnUiThread {
+                    binding.tvNoInternet.visibility = View.VISIBLE
+                }
+            }
+        }
+
+        val networkRequest = NetworkRequest.Builder()
+            .addCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
+            .build()
+
+        connectivityManager.registerNetworkCallback(networkRequest, networkCallback)
+    }
+
+
+    override fun onDestroy() {
+        super.onDestroy()
+        connectivityManager.unregisterNetworkCallback(networkCallback)
     }
 
 }
