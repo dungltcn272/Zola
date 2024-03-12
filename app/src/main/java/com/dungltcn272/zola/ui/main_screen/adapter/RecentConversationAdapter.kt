@@ -2,8 +2,10 @@ package com.dungltcn272.zola.ui.main_screen.adapter
 
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.graphics.Typeface
 import android.util.Base64
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.AsyncListDiffer
 import androidx.recyclerview.widget.DiffUtil
@@ -16,7 +18,7 @@ import java.util.Locale
 import java.util.concurrent.TimeUnit
 
 
-class RecentConversationAdapter(private val myId : String) :
+class RecentConversationAdapter(private val currentUserId : String) :
     RecyclerView.Adapter<RecentConversationAdapter.ConversationViewHolder>() {
 
 
@@ -69,17 +71,24 @@ class RecentConversationAdapter(private val myId : String) :
         fun setData(chatMessage: ChatMessage) {
             binding.imgProfile.setImageBitmap(getConversionImage(chatMessage.conversationImage))
             binding.tvName.text = chatMessage.conversationName
-            if (chatMessage.senderId == myId){
+            if (chatMessage.senderId == currentUserId){
                 binding.tvRecentMessage.text = String.format("You: ${chatMessage.message}")
             }else{
                 binding.tvRecentMessage.text = chatMessage.message
+                if (chatMessage.receiverSeen){
+                    binding.seenStatus.visibility = View.INVISIBLE
+                    binding.tvRecentMessage.setTypeface(null, Typeface.NORMAL)
+                }else{
+                    binding.seenStatus.visibility = View.VISIBLE
+                    binding.tvRecentMessage.setTypeface(null, Typeface.BOLD)
+                }
             }
             binding.tvTime.text = formatDateToString(chatMessage.dateObject!!)
 
         }
     }
 
-    fun formatDateToString(date: Date): String {
+    private fun formatDateToString(date: Date): String {
         val currentTime = System.currentTimeMillis()
         val timeDiff = currentTime - date.time
 

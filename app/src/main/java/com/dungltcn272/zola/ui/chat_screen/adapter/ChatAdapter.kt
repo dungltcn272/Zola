@@ -2,6 +2,7 @@ package com.dungltcn272.zola.ui.chat_screen.adapter
 
 import android.graphics.Bitmap
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.AsyncListDiffer
 import androidx.recyclerview.widget.DiffUtil
@@ -9,8 +10,12 @@ import androidx.recyclerview.widget.RecyclerView
 import com.dungltcn272.zola.databinding.ItemContainerReceivedMessageBinding
 import com.dungltcn272.zola.databinding.ItemContainerSentMessageBinding
 import com.dungltcn272.zola.model.ChatMessage
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
+import java.util.concurrent.TimeUnit
 
-class ChatAdapter(val receiverProfileImage: Bitmap, private val senderId: String) :
+class ChatAdapter(val otherUserProfileImage: Bitmap, private val currentUserId: String) :
     RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
 
@@ -20,7 +25,7 @@ class ChatAdapter(val receiverProfileImage: Bitmap, private val senderId: String
     }
 
     override fun getItemViewType(position: Int): Int {
-        return if (differ.currentList[position].senderId == senderId) {
+        return if (differ.currentList[position].senderId == currentUserId) {
             VIEW_TYPE_SENT
         } else {
             VIEW_TYPE_RECEIVER
@@ -53,9 +58,9 @@ class ChatAdapter(val receiverProfileImage: Bitmap, private val senderId: String
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         if (getItemViewType(position) == VIEW_TYPE_SENT) {
-            (holder as SentMessageViewHolder).setData(differ.currentList[position])
+            (holder as SentMessageViewHolder).setData(position)
         } else {
-            (holder as ReceiverMessageViewHolder).setData(differ.currentList[position])
+            (holder as ReceiverMessageViewHolder).setData(position)
         }
     }
 
@@ -72,18 +77,83 @@ class ChatAdapter(val receiverProfileImage: Bitmap, private val senderId: String
 
     inner class SentMessageViewHolder(private val binding: ItemContainerSentMessageBinding) :
         RecyclerView.ViewHolder(binding.root) {
-        fun setData(chatMessage: ChatMessage) {
+        fun setData(position: Int) {
+            val chatMessage = differ.currentList[position]
             binding.tvMessage.text = chatMessage.message
-            binding.tvDatetime.text = chatMessage.datetime
+            if (formatDateToString(chatMessage.dateObject!!).isEmpty()){
+                binding.tvDatetime.visibility = View.GONE
+            }else{
+                binding.tvDatetime.text = formatDateToString(chatMessage.dateObject!!)
+                if (position < differ.currentList.size - 1) {
+                    val seconds =
+                        TimeUnit.MILLISECONDS.toSeconds(differ.currentList[position + 1].dateObject!!.time - chatMessage.dateObject!!.time)
+                    if(seconds < 60){
+                        binding.tvDatetime.visibility = View.GONE
+                    }
+                }else{
+                    binding.tvDatetime.visibility = View.VISIBLE
+                }
+            }
         }
     }
 
     inner class ReceiverMessageViewHolder(private val binding: ItemContainerReceivedMessageBinding) :
         RecyclerView.ViewHolder(binding.root) {
-        fun setData(chatMessage: ChatMessage) {
+        fun setData(position: Int) {
+            val chatMessage = differ.currentList[position]
             binding.tvMessage.text = chatMessage.message
-            binding.tvDatetime.text = chatMessage.datetime
-            binding.imgProfileReceiver.setImageBitmap(receiverProfileImage)
+            binding.imgProfileReceiver.setImageBitmap(otherUserProfileImage)
+            if (formatDateToString(chatMessage.dateObject!!).isEmpty()){
+                binding.tvDatetime.visibility = View.GONE
+            }else{
+                binding.tvDatetime.text = formatDateToString(chatMessage.dateObject!!)
+                if (position < differ.currentList.size - 1) {
+                    val seconds =
+                        TimeUnit.MILLISECONDS.toSeconds(differ.currentList[position + 1].dateObject!!.time - chatMessage.dateObject!!.time)
+                    if(seconds < 60){
+                        binding.tvDatetime.visibility = View.GONE
+                    }
+                }else{
+                    binding.tvDatetime.visibility = View.VISIBLE
+                }
+            }
+        }
+    }
+
+    private fun formatDateToString(date: Date): String {
+        val currentTime = System.currentTimeMillis()
+        val timeDiff = currentTime - date.time
+
+        val seconds = TimeUnit.MILLISECONDS.toSeconds(timeDiff)
+        val minutes = TimeUnit.MILLISECONDS.toMinutes(timeDiff)
+        val hours = TimeUnit.MILLISECONDS.toHours(timeDiff)
+        val days = TimeUnit.MILLISECONDS.toDays(timeDiff)
+
+        return when {
+            seconds < 60 -> {
+                // less than 1 minutes
+                String.format("")
+            }
+
+            minutes < 60 -> {
+                // less than 1 hour
+                String.format("$minutes minutes")
+            }
+
+            hours < 24 -> {
+                // less than 1 day
+                String.format("$hours hours")
+            }
+
+            days < 30 -> {
+                // less than 1 month
+                String.format("$days days")
+            }
+
+            else -> {
+                // more than 1 month
+                SimpleDateFormat("dd 'Th' MM HH:mm", Locale.getDefault()).format(date)
+            }
         }
     }
 

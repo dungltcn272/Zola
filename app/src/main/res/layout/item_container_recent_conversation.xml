@@ -5,6 +5,16 @@
     android:layout_height="wrap_content"
     android:padding="@dimen/_8sdp">
 
+    <View
+        android:id="@+id/seen_status"
+        android:layout_width="@dimen/_10sdp"
+        android:layout_height="@dimen/_10sdp"
+        android:background="@drawable/bg_dot_seen"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:visibility="invisible"/>
+
     <com.makeramen.roundedimageview.RoundedImageView
         android:id="@+id/img_profile"
         android:layout_width="@dimen/_35sdp"
@@ -35,7 +45,7 @@
         android:textSize="@dimen/_13sdp"
         android:textColor="@color/primary_text"
         app:layout_constraintBottom_toTopOf="@id/viewSupporter"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintEnd_toEndOf="@id/seen_status"
         app:layout_constraintStart_toEndOf="@id/img_profile"/>
 
     <androidx.appcompat.widget.LinearLayoutCompat
@@ -43,7 +53,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/_8sdp"
         android:layout_marginEnd="@dimen/_8sdp"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintEnd_toEndOf="@id/seen_status"
         android:orientation="horizontal"
         android:gravity="center_vertical"
         app:layout_constraintStart_toEndOf="@id/img_profile"
