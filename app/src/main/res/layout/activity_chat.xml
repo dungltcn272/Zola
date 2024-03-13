@@ -128,7 +128,7 @@
         android:layout_marginBottom="@dimen/_12sdp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
-        android:background="@drawable/bg_chat_input">
+        android:background="@drawable/bg_btn_send">
         <androidx.appcompat.widget.AppCompatImageView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
