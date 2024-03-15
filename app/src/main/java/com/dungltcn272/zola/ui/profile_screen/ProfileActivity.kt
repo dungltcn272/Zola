@@ -58,9 +58,10 @@ class ProfileActivity : BaseActivity() {
     }
 
     private fun setListener() {
-        if(isCurrentUser){
+        if (isCurrentUser) {
             binding.layoutImage.setOnClickListener {
-                val intent = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
+                val intent =
+                    Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
                 intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
                 pickImage.launch(intent)
             }
@@ -77,14 +78,10 @@ class ProfileActivity : BaseActivity() {
     }
 
     private fun updateInformation() {
-        if (encodedImage != thisUser.image) {
-            database.collection(Constants.KEY_COLLECTION_USER).document(thisUser.id)
-                .update(Constants.KEY_IMAGE, encodedImage)
-        }
         val newName = binding.edtUsername.text.toString().trim()
-        if (newName != thisUser.name) {
+        if (encodedImage != thisUser.image || newName != thisUser.name) {
             database.collection(Constants.KEY_COLLECTION_USER).document(thisUser.id)
-                .update(Constants.KEY_NAME, newName)
+                .update(Constants.KEY_IMAGE, encodedImage, Constants.KEY_NAME, newName)
                 .addOnSuccessListener {
                     showToast("Update successfully")
                 }.addOnFailureListener {
@@ -127,6 +124,7 @@ class ProfileActivity : BaseActivity() {
     private fun showToast(message: String) {
         Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
     }
+
     private fun hideKeyboard() {
         val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
 
